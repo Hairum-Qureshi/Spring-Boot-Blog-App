@@ -1,8 +1,8 @@
 package com.example.Blog_App.user;
 
 import com.example.Blog_App.user.enums.Provider;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
@@ -18,11 +18,10 @@ public class UserDto {
     private UUID id;
 
     @NotBlank
-    @NotNull
+    @Email
     private String email;
 
     @NotBlank
-    @NotNull
     private String name;
 
     private boolean enabled;
