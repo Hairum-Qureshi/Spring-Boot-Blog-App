@@ -16,7 +16,7 @@ import java.time.Instant;
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private Long id;
 
     @Column(nullable = false)
