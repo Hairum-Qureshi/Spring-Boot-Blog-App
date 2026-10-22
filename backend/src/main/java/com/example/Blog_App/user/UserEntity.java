@@ -1,10 +1,11 @@
-package com.example.Blog_App.user.entities;
+package com.example.Blog_App.user;
 
-import com.example.Blog_App.user.entities.enums.Provider;
+import com.example.Blog_App.user.enums.Provider;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -17,7 +18,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
