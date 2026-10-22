@@ -3,36 +3,36 @@ package com.example.Blog_App.user;
 import com.example.Blog_App.user.enums.Provider;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserDto {
+public record UserDto(
+        UUID id,
 
-    private UUID id;
+        @NotBlank
+        @Email
+        String email,
 
-    @NotBlank
-    @Email
-    private String email;
+        @NotBlank
+        String name,
 
-    @NotBlank
-    private String name;
+        boolean enabled,
 
-    private boolean enabled;
+        String profilePicture,
 
-    private String profilePicture;
+        String biography,
 
-    private String biography;
+        Instant createdAt,
 
-    private Instant createdAt;
+        Instant updatedAt,
 
-    private Instant updatedAt;
-
-    private Provider provider = Provider.LOCAL;
+        Provider provider
+) {
+    // Default provider when null is supplied
+    public UserDto {
+        if (provider == null) {
+            provider = Provider.LOCAL;
+        }
+    }
 }
