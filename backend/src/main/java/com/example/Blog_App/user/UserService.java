@@ -5,6 +5,7 @@ import com.example.Blog_App.user.enums.Provider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -54,7 +55,14 @@ public class UserService {
         return null;
     }
 
-    public void deleteUser(String email) {
+    public UserDto getUserById(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(false, "id: " + userId));
+
+        UserDto userDto = userMapper.toDto(user);
+        return userDto;
+    }
+
+    public void deleteUser(UUID userId) {
         // Implement the logic to delete a user by email
     }
 
