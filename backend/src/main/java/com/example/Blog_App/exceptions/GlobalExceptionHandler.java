@@ -30,4 +30,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(409).body(error);
     }
+
+    @ExceptionHandler(PasswordsNotMatchingException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordsNotMatching(PasswordsNotMatchingException exception) {
+        ErrorResponse error = new ErrorResponse(
+                exception.getMessage(),
+                400,
+                "PASSWORDS_NOT_MATCHING"
+        );
+
+        return ResponseEntity.status(400).body(error);
+    }
 }
