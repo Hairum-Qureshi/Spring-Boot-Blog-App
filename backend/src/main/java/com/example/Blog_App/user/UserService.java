@@ -1,5 +1,6 @@
 package com.example.Blog_App.user;
 
+import com.example.Blog_App.exceptions.UserNotFoundException;
 import com.example.Blog_App.user.enums.Provider;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,7 @@ public class UserService {
         boolean enabled = userDto.enabled();
         String profilePicture = userDto.profilePicture();
         String biography = userDto.biography();
-
-       
+        
         Provider provider = userDto.provider() != null ? userDto.provider() : Provider.LOCAL;
 
         UserEntity user = UserEntity.builder()
@@ -42,7 +42,12 @@ public class UserService {
     }
 
     public UserDto getUserByEmail(String email) {
-        return null;
+
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(false, "email: " + email));
+
+        UserDto userDto = userMapper.toDto(user);
+
+        return userDto;
     }
 
     public UserDto updateUser(String email, String userId) {
