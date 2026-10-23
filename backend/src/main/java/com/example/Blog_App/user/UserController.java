@@ -32,10 +32,5 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/find")
-    public ResponseEntity<UserDto> getUserByEmail(@RequestBody String email) {
-        UserDto user = userService.getUserByEmail(email);
 
-        return ResponseEntity.ok(user);
-    }
 }
