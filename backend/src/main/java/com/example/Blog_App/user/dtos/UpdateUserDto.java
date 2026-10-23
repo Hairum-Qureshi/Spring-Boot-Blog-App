@@ -14,9 +14,4 @@ public record UpdateUserDto(
 
         @Size(max = 500, message = "Biography can only have a max length of 500 characters")
         String biography) {
-    public UpdateUserDto {
-        if (biography == null || biography.isEmpty()) {
-            biography = "This user has not set a biography yet.";
-        }
-    }
 }
