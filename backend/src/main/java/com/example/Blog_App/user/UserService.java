@@ -66,10 +66,6 @@ public class UserService {
         // Implement the logic to delete a user by email
     }
 
-    public UserDto getUserById(String userId) {
-        return null;
-    }
-
     public List<UserDto> getAllUsers() {
         // Retrieves all users from a database, converts them into DTOs, and returns them as a list.
         return userRepository.findAll().stream().map(user -> userMapper.toDto(user)).toList();
