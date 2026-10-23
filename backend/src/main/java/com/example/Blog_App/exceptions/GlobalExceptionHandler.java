@@ -19,4 +19,15 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(404).body(error);
     }
+
+    @ExceptionHandler(ResourceExistsException.class)
+    public ResponseEntity<ErrorResponse> handleResourceExists(ResourceExistsException exception) {
+        ErrorResponse error = new ErrorResponse(
+                exception.getMessage(),
+                409,
+                "RESOURCE_ALREADY_EXISTS"
+        );
+
+        return ResponseEntity.status(409).body(error);
+    }
 }
