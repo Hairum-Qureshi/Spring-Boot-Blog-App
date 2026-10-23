@@ -24,10 +24,7 @@ public class UserService {
         String profilePicture = userDto.profilePicture();
         String biography = userDto.biography();
 
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
+       
         Provider provider = userDto.provider() != null ? userDto.provider() : Provider.LOCAL;
 
         UserEntity user = UserEntity.builder()
