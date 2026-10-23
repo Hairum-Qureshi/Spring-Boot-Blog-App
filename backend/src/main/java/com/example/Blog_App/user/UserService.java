@@ -18,6 +18,12 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    private UserEntity findUser(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with ID: " + userId));
+
+        return user;
+    }
+
     public UserDto createUser(UserDto userDto) {
 
         String email = userDto.email();
@@ -51,20 +57,20 @@ public class UserService {
         return userDto;
     }
 
-    public UserDto updateUser(String email, String userId) {
-        return null;
+    public UserDto updateUser(String email, UUID userId) {
+        UserEntity user = findUser(userId);
+        user.setEmail(email);
+        UserEntity updatedUser = userRepository.save(user);
+        return userMapper.toDto(updatedUser);
     }
 
     public UserDto getUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with ID: " + userId));
-
-        UserDto userDto = userMapper.toDto(user);
-        return userDto;
+        UserEntity user = findUser(userId);
+        return userMapper.toDto(user);
     }
 
     public void deleteUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with ID: " + userId));
-
+        UserEntity user = findUser(userId);
         userRepository.delete(user);
     }
 
