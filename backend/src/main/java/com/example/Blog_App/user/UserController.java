@@ -31,4 +31,11 @@ public class UserController {
         // equivalent to ResponseEntity.status(HttpStatus.OK).body(users);
         return ResponseEntity.ok(users);
     }
+
+    @PostMapping("/find")
+    public ResponseEntity<UserDto> getUserByEmail(@RequestBody String email) {
+        UserDto user = userService.getUserByEmail(email);
+
+        return ResponseEntity.ok(user);
+    }
 }
