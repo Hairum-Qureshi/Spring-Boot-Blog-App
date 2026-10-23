@@ -6,6 +6,8 @@ export default function VerifyEmail() {
   const inputRef = useRef<HTMLInputElement[]>([]);
   const [showSubmitButton, setShowSubmitButton] = useState(false);
 
+  // TODO - replace placeholder email
+
   const startTimer = () => {
     setTimeLeft(60);
     setIsRunning(true);
@@ -30,7 +32,7 @@ export default function VerifyEmail() {
       <h1 className="text-2xl font-semibold">Verify Your Email</h1>
 
       <p className="my-2 text-center text-gray-600">
-        Please check your email for a verification link
+        We sent a code to user@placeholder.com
       </p>
 
       <div className="space-x-2">
