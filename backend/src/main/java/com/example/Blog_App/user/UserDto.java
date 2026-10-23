@@ -10,11 +10,11 @@ import java.util.UUID;
 public record UserDto(
         UUID id,
 
-        @NotBlank
-        @Email
+        @NotBlank(message = "Email is required")
+        @Email(message = "Email should be valid")
         String email,
 
-        @NotBlank
+        @NotBlank(message = "Name is required")
         String name,
 
         boolean enabled,
