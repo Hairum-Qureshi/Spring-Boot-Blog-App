@@ -1,6 +1,6 @@
 package com.example.Blog_App.user;
 
-import com.example.Blog_App.exceptions.UserNotFoundException;
+import com.example.Blog_App.exceptions.ResourceNotFoundException;
 import com.example.Blog_App.user.enums.Provider;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,7 @@ public class UserService {
 
     public UserDto getUserByEmail(String email) {
 
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(false, "email: " + email));
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with email: " + email));
 
         UserDto userDto = userMapper.toDto(user);
 
@@ -56,7 +56,7 @@ public class UserService {
     }
 
     public UserDto getUserById(UUID userId) {
-        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(false, "id: " + userId));
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with ID: " + userId));
 
         UserDto userDto = userMapper.toDto(user);
         return userDto;
