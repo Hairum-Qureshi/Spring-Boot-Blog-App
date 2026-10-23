@@ -1,10 +1,10 @@
 package com.example.Blog_App.user;
 
+import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.exceptions.ResourceExistsException;
 import com.example.Blog_App.exceptions.ResourceNotFoundException;
 import com.example.Blog_App.user.dtos.UpdateUserDto;
 import com.example.Blog_App.user.dtos.UserDto;
-import com.example.Blog_App.user.enums.Provider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,22 +30,19 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto createUser(UserDto userDto) {
-        String email = userDto.email();
-        String name = userDto.name();
-        boolean enabled = userDto.enabled();
+    public UserDto createUser(SignUpDto signUpDto) {
+        String email = signUpDto.email();
+        String name = signUpDto.name();
+        String password = signUpDto.password();
 
         if (userRepository.existsByEmail(email)) {
             throw new ResourceExistsException(false, "User already exists with email: " + email);
         }
 
-        Provider provider = userDto.provider() != null ? userDto.provider() : Provider.LOCAL;
-
         UserEntity user = UserEntity.builder()
                 .email(email)
                 .name(name)
-                .enabled(enabled)
-                .provider(provider)
+                .password(password)
                 .build();
 
         UserEntity savedUser = userRepository.save(user);
