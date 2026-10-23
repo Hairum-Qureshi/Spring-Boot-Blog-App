@@ -23,7 +23,6 @@ public class AuthenticationService {
             throw new PasswordsNotMatchingException("Passwords do not match");
         }
 
-        UserDto userDto = userService.createUser(signUpDto);
-        return userDto;
+        return userService.createUser(signUpDto);
     }
 }
