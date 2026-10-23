@@ -62,8 +62,10 @@ public class UserService {
         return userDto;
     }
 
-    public void deleteUser(UUID userId) {
-        // Implement the logic to delete a user by email
+    public void deleteUserById(UUID userId) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(false, "User not found with ID: " + userId));
+
+        userRepository.delete(user);
     }
 
     public List<UserDto> getAllUsers() {
