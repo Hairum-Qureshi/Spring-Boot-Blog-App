@@ -4,7 +4,6 @@ import '../css/index.css';
 import NotFound from '../pages/NotFound';
 import Auth from '../pages/Auth';
 import Home from '../pages/Home';
-import VerifyEmail from '../pages/VerifyEmail';
 
 export default function App() {
   return (
@@ -15,7 +14,7 @@ export default function App() {
       <Routes>
         <Route path="/sign-up" element={<Auth />} />
         <Route path="/sign-in" element={<Auth />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email" element={<Auth />} />
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
