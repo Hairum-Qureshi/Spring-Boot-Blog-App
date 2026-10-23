@@ -4,6 +4,7 @@ export default function VerifyEmail() {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
   const inputRef = useRef<HTMLInputElement[]>([]);
+  const [showSubmitButton, setShowSubmitButton] = useState(false);
 
   const startTimer = () => {
     setTimeLeft(60);
@@ -24,7 +25,6 @@ export default function VerifyEmail() {
 
     return () => clearTimeout(timeoutId);
   }, [timeLeft, isRunning]);
-
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h1 className="text-2xl font-semibold">Verify Your Email</h1>
@@ -76,28 +76,48 @@ export default function VerifyEmail() {
                   inputs[i + 1]?.focus();
                 }, 0);
               }
+
+              if (i === inputs.length - 1 && e.currentTarget.value !== '') {
+                setShowSubmitButton(true);
+              } else {
+                setShowSubmitButton(false);
+              }
             }}
           />
         ))}
       </div>
 
-      <p className="my-5 text-center text-slate-400 text-sm">
-        Didn't receive the email? Check your spam folder.
-      </p>
+      {!showSubmitButton ? (
+        <>
+          <p className="my-5 text-center text-slate-400 text-sm">
+            Didn't receive the email? Check your spam folder.
+          </p>
 
-      {!isRunning ? (
+          {!isRunning ? (
+            <button
+              type="button"
+              className="text-sm text-blue-500 hover:underline"
+              onClick={startTimer}
+            >
+              Request New Verification Email
+            </button>
+          ) : (
+            <div className="text-center text-sm text-gray-500 space-y-1">
+              <p>Request a new verification email in {timeLeft}s</p>
+              <p className="text-green-600">Verification email sent!</p>
+            </div>
+          )}
+        </>
+      ) : (
         <button
           type="button"
-          className="text-sm hover:cursor-pointer text-blue-500 hover:underline"
-          onClick={startTimer}
+          className="my-5 w-1/2 rounded-md bg-black text-sm text-white p-3 hover:cursor-pointer"
+          onClick={() => {
+            // Handle OTP verification here
+          }}
         >
-          Request New Verification Email
+          Verify Email
         </button>
-      ) : (
-        <span className="text-center text-sm text-gray-500 space-y-1">
-          <p>Request a new verification email in {timeLeft}s</p>
-          <p className="text-green-600">Verification email sent!</p>
-        </span>
       )}
     </div>
   );
