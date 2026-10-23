@@ -24,7 +24,7 @@ public class UserService {
         boolean enabled = userDto.enabled();
         String profilePicture = userDto.profilePicture();
         String biography = userDto.biography();
-        
+
         Provider provider = userDto.provider() != null ? userDto.provider() : Provider.LOCAL;
 
         UserEntity user = UserEntity.builder()
