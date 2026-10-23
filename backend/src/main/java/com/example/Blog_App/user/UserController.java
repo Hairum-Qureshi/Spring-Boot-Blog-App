@@ -1,7 +1,7 @@
 package com.example.Blog_App.user;
 
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import com.example.Blog_App.user.dtos.UpdateUserDto;
+import com.example.Blog_App.user.dtos.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +18,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-        UserDto user = userService.createUser(userDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
-    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
         UserDto user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable UUID userId) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDto updateUserDto) {
+        UserDto updatedUser = userService.updateUser(updateUserDto, userId);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping("/all")
