@@ -1,4 +1,4 @@
-package com.example.Blog_App.user;
+package com.example.Blog_App.user.dtos;
 
 import com.example.Blog_App.user.enums.Provider;
 import jakarta.validation.constraints.Email;
@@ -18,10 +18,6 @@ public record UserDto(
         String name,
 
         boolean enabled,
-
-        String profilePicture,
-
-        String biography,
 
         Instant createdAt,
 
