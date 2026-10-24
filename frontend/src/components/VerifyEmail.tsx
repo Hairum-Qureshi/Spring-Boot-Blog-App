@@ -131,7 +131,7 @@ export default function VerifyEmail() {
           {/* Back to login */}
           <button
             type="button"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/sign-in')}
             className="mt-2 inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover:cursor-pointer"
           >
             <FaArrowLeftLong className="h-4 w-4" />
