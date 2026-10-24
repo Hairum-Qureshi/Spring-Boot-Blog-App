@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeftLong } from 'react-icons/fa6';
 
 export default function VerifyEmail() {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
   const inputRef = useRef<HTMLInputElement[]>([]);
   const [showSubmitButton, setShowSubmitButton] = useState(false);
+  const navigate = useNavigate();
 
   // TODO - replace placeholder email
 
@@ -90,26 +93,51 @@ export default function VerifyEmail() {
       </div>
 
       {!showSubmitButton ? (
-        <>
-          <p className="my-5 text-center text-slate-400 text-sm">
+        <div className="flex w-full flex-col items-center gap-5">
+          {/* Email instructions */}
+          <p className="text-center text-sm leading-relaxed text-slate-500">
             Didn't receive the email? Check your spam folder.
           </p>
 
-          {!isRunning ? (
-            <button
-              type="button"
-              className="text-sm text-blue-500 hover:underline"
-              onClick={startTimer}
-            >
-              Request New Verification Email
-            </button>
-          ) : (
-            <div className="text-center text-sm text-gray-500 space-y-1">
-              <p>Request a new verification email in {timeLeft}s</p>
-              <p className="text-green-600">Verification email sent!</p>
-            </div>
-          )}
-        </>
+          {/* Resend verification email */}
+          <div className="flex flex-col items-center gap-2">
+            {!isRunning ? (
+              <button
+                type="button"
+                onClick={startTimer}
+                className="text-sm font-medium text-blue-600 transition-colors hover:text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded hover:cursor-pointer"
+              >
+                Request New Verification Email
+              </button>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-center">
+                <p className="text-sm text-slate-500">
+                  Request a new verification email in{' '}
+                  <span className="font-semibold text-slate-700">
+                    {timeLeft}s
+                  </span>
+                </p>
+
+                <div
+                  role="status"
+                  className="flex items-center gap-2 text-sm font-medium text-green-600"
+                >
+                  Verification email sent!
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Back to login */}
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="mt-2 inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover:cursor-pointer"
+          >
+            <FaArrowLeftLong className="h-4 w-4" />
+            <span>Back to Login</span>
+          </button>
+        </div>
       ) : (
         <button
           type="button"
