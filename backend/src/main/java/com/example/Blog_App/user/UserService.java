@@ -30,10 +30,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto createUser(SignUpDto signUpDto) {
+    public UserDto createUser(SignUpDto signUpDto, String encodedPassword) {
         String email = signUpDto.email();
         String name = signUpDto.name();
-        String password = signUpDto.password();
 
         if (userRepository.existsByEmail(email)) {
             throw new ResourceExistsException(false, "User already exists with email: " + email);
@@ -42,7 +41,7 @@ public class UserService {
         UserEntity user = UserEntity.builder()
                 .email(email)
                 .name(name)
-                .password(password)
+                .password(encodedPassword)
                 .build();
 
         UserEntity savedUser = userRepository.save(user);
