@@ -3,6 +3,8 @@ package com.example.Blog_App.user;
 import com.example.Blog_App.user.enums.Provider;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -51,6 +53,8 @@ public class UserEntity implements UserDetails {
     private Instant updatedAt = Instant.now(); // time in UTC
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private Provider provider = Provider.LOCAL;
 
     @Override
