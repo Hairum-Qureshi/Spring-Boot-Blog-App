@@ -40,6 +40,7 @@ public class UserEntity implements UserDetails {
     @Builder.Default
     private boolean enabled = true;
 
+    @Builder.Default
     @Column(nullable = false, length = 500)
     private String biography = "This user has not set a biography yet.";
 
