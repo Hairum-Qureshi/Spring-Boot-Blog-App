@@ -95,7 +95,7 @@ export default function VerifyEmail() {
       {!showSubmitButton ? (
         <div className="flex w-full flex-col items-center gap-5">
           {/* Email instructions */}
-          <p className="text-center text-sm leading-relaxed text-slate-500">
+          <p className="mt-4 text-center text-sm leading-relaxed text-slate-500">
             Didn't receive the email? Check your spam folder.
           </p>
 
