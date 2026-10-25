@@ -50,11 +50,7 @@ public class JwtService {
 
     // parse JWT
     public Jws<Claims> parse(String jwt) {
-        try {
-            return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt);
-        } catch (Exception e) {
-            throw e;
-        }
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(jwt);
     }
 
     public boolean isAccessToken(String token) {
@@ -71,4 +67,8 @@ public class JwtService {
         return parse(token).getPayload().getId();
     }
 
+    public String getEmail(String token) {
+        Claims c = parse(token).getPayload();
+        return c.get("email", String.class);
+    }
 }
