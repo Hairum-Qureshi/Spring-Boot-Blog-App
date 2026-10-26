@@ -59,8 +59,7 @@ public class AuthenticationService {
 
         String accessToken = jwtService.generateAccessToken(user);
 
-        TokenResponse tokenResponse = TokenResponse.of(accessToken, "", jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
-        return tokenResponse;
+        return TokenResponse.of(accessToken, "", jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
     }
 
     private Authentication authenticate(SignInDto signInDto) {
