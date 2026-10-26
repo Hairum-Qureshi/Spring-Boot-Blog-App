@@ -4,6 +4,7 @@ import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.user.dtos.UserDto;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +28,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<TokenResponse> signInUser(@RequestBody SignInDto signInDto) {
-        TokenResponse tokenResponse = authService.signIn(signInDto);
+    public ResponseEntity<TokenResponse> signInUser(@RequestBody SignInDto signInDto, HttpServletResponse response) {
+        TokenResponse tokenResponse = authService.signIn(signInDto, response);
 
         return ResponseEntity.ok(tokenResponse);
     }
