@@ -65,13 +65,14 @@ public class AuthenticationService {
         if (!user.isEnabled()) throw new DisabledException("User account is disabled");
 
         String jti = UUID.randomUUID().toString();
-        var refreshToken = RefreshTokenEntity.builder().jti(jti).user(user).createdAt(Instant.now()).expiresAt(Instant.now().plusSeconds(jwtService.getAccessTokenTTLSeconds())).revoked(false).build();
+        var buildRefreshToken = RefreshTokenEntity.builder().jti(jti).user(user).createdAt(Instant.now()).expiresAt(Instant.now().plusSeconds(jwtService.getAccessTokenTTLSeconds())).revoked(false).build();
 
-        refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(buildRefreshToken);
 
         String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user, jti);
 
-        return TokenResponse.of(accessToken, "", jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
+        return TokenResponse.of(accessToken, refreshToken, jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
     }
 
     private Authentication authenticate(SignInDto signInDto) {
