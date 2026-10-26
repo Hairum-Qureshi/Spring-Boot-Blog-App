@@ -1,5 +1,6 @@
 package com.example.Blog_App.authentication;
 
+import com.example.Blog_App.authentication.cookies.CookieService;
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.authentication.jwt.JwtService;
@@ -16,6 +17,7 @@ import com.example.Blog_App.user.UserRepository;
 import com.example.Blog_App.user.UserService;
 import com.example.Blog_App.user.dtos.UserDto;
 import com.resend.core.exception.ResendException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -40,8 +42,9 @@ public class AuthenticationService {
     private final UserMapper userMapper;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MailService mailService;
+    private final CookieService cookieService;
 
-    public AuthenticationService(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, UserMapper userMapper, RefreshTokenRepository refreshTokenRepository, MailService mailService) {
+    public AuthenticationService(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, UserMapper userMapper, RefreshTokenRepository refreshTokenRepository, MailService mailService, CookieService cookieService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -50,6 +53,7 @@ public class AuthenticationService {
         this.mailService = mailService;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
+        this.cookieService = cookieService;
     }
 
     public UserDto signUpUser(SignUpDto signUpDto) {
@@ -83,11 +87,11 @@ public class AuthenticationService {
         userRepository.save(user);
     }
 
-    public String resendVerificationCode(String email) {
-        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public void resendVerificationCode(String email) {
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(false, "User not found"));
 
         if (user.isVerified()) {
-            throw new IllegalArgumentException("User is already verified");
+            throw new InvalidVerificationCodeException("User is already verified");
         }
 
         String verificationCode = userService.generateCode();
@@ -102,11 +106,9 @@ public class AuthenticationService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return verificationCode;
     }
 
-    public TokenResponse signIn(SignInDto signInDto) {
+    public TokenResponse signIn(SignInDto signInDto, HttpServletResponse response) {
         UserEntity user = userRepository.findByEmail(signInDto.email()).orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         if (!user.isVerified()) {
@@ -124,6 +126,9 @@ public class AuthenticationService {
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user, jti);
+
+        cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTokenTTLSeconds());
+        cookieService.addNoStoreHeaders(response);
 
         return TokenResponse.of(accessToken, refreshToken, jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
     }
