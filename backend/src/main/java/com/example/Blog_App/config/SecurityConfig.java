@@ -57,7 +57,7 @@ public class SecurityConfig {
                     String error = (String) request.getAttribute("error");
                     if (error != null) message = error;
 
-                    Map<String, String> errorMap = Map.of("message", message, "status", String.valueOf(statusCode), "statusCode", String.valueOf(statusCode));
+                    Map<String, Object> errorMap = Map.of("message", message, "status", String.valueOf(statusCode), "statusCode", statusCode);
                     var objectMapper = new ObjectMapper();
                     response.getWriter().write(objectMapper.writeValueAsString(errorMap));
                 })).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
