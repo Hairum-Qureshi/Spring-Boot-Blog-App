@@ -67,6 +67,13 @@ public class UserEntity implements UserDetails {
         return email;
     }
 
+    @Builder.Default
+    private boolean isVerified = false;
+
+    private String verificationCode;
+
+    private Instant verificationCodeExpiresAt;
+
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
