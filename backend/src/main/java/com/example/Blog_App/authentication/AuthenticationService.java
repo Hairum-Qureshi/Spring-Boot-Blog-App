@@ -3,6 +3,8 @@ package com.example.Blog_App.authentication;
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.authentication.jwt.JwtService;
+import com.example.Blog_App.authentication.refreshToken.RefreshTokenEntity;
+import com.example.Blog_App.authentication.refreshToken.RefreshTokenRepository;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.exceptions.PasswordsNotMatchingException;
 import com.example.Blog_App.user.UserEntity;
@@ -18,6 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Service
 public class AuthenticationService {
 
@@ -27,11 +32,13 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthenticationService(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, UserMapper userMapper) {
+    public AuthenticationService(UserService userService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, UserRepository userRepository, JwtService jwtService, UserMapper userMapper, RefreshTokenRepository refreshTokenRepository) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.userMapper = userMapper;
@@ -56,6 +63,11 @@ public class AuthenticationService {
         UserEntity user = userRepository.findByEmail(signInDto.email()).orElseThrow(() -> new BadCredentialsException("Invalid username or password"));
 
         if (!user.isEnabled()) throw new DisabledException("User account is disabled");
+
+        String jti = UUID.randomUUID().toString();
+        var refreshToken = RefreshTokenEntity.builder().jti(jti).user(user).createdAt(Instant.now()).expiresAt(Instant.now().plusSeconds(jwtService.getAccessTokenTTLSeconds())).revoked(false).build();
+
+        refreshTokenRepository.save(refreshToken);
 
         String accessToken = jwtService.generateAccessToken(user);
 
