@@ -1,6 +1,9 @@
 import AuthForm from '../components/AuthForm';
+import VerifyEmail from '../components/VerifyEmail';
+import { useLocation } from 'react-router-dom';
 
 export default function Auth() {
+  const location = useLocation();
 
   return (
     <div className="flex w-full h-screen overflow-0">
@@ -25,7 +28,7 @@ export default function Auth() {
         </div>
       </div>
       <div className="w-1/2 bg-slate-100/50">
-        <AuthForm />
+        {location.pathname === '/verify-email' ? <VerifyEmail /> : <AuthForm />}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeftLong } from 'react-icons/fa6';
 
@@ -9,7 +10,8 @@ export default function VerifyEmail() {
   const [showSubmitButton, setShowSubmitButton] = useState(false);
   const navigate = useNavigate();
 
-  // TODO - replace placeholder email
+  const location = useLocation();
+  const email = location.state?.email;
 
   const startTimer = () => {
     setTimeLeft(60);
@@ -35,7 +37,8 @@ export default function VerifyEmail() {
       <h1 className="text-2xl font-semibold">Verify Your Email</h1>
 
       <p className="my-2 text-center text-gray-600">
-        We sent a code to user@placeholder.com
+        We sent a code to{' '}
+        <span className="font-semibold text-sky-600">{email}</span>!
       </p>
 
       <div className="space-x-2">
