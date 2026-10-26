@@ -29,13 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
 
-            if (!jwtService.isAccessToken(token)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
             try {
                 Jws<Claims> parse = jwtService.parse(token);
                 Claims payload = parse.getPayload();
+
+                if (!"access".equals(payload.get("type"))) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 String userId = payload.getSubject();
                 UUID userUUID = UUID.fromString(userId);
@@ -52,13 +53,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 });
 
             } catch (ExpiredJwtException e) {
-                e.printStackTrace();
-            } catch (MalformedJwtException e) {
-                e.printStackTrace();
-            } catch (JwtException e) {
-                e.printStackTrace();
+                request.setAttribute("error", "Token expired");
+            } catch (JwtException | IllegalArgumentException e) {
+                request.setAttribute("error", "Invalid token");
             } catch (Exception e) {
-                e.printStackTrace();
+                request.setAttribute("error", "Internal server error");
             }
         }
 
