@@ -7,6 +7,7 @@ import com.example.Blog_App.authentication.refreshToken.RefreshTokenEntity;
 import com.example.Blog_App.authentication.refreshToken.RefreshTokenRepository;
 import com.example.Blog_App.authentication.resend.MailService;
 import com.example.Blog_App.authentication.responses.TokenResponse;
+import com.example.Blog_App.exceptions.InvalidVerificationCodeException;
 import com.example.Blog_App.exceptions.PasswordsNotMatchingException;
 import com.example.Blog_App.exceptions.ResourceNotFoundException;
 import com.example.Blog_App.user.UserEntity;
@@ -69,10 +70,10 @@ public class AuthenticationService {
         if (code == null || code.isBlank())
             throw new ResourceNotFoundException(false, "Verification code is required");
 
-        UserEntity user = userRepository.findByVerificationCode(code).orElseThrow(() -> new IllegalArgumentException("Invalid verification code: " + code));
+        UserEntity user = userRepository.findByVerificationCode(code).orElseThrow(() -> new InvalidVerificationCodeException("Invalid verification code: " + code));
 
         if (user.getVerificationCodeExpiresAt().isBefore(Instant.now())) {
-            throw new IllegalArgumentException("Verification code has expired. Please request a new one.");
+            throw new InvalidVerificationCodeException("Verification code has expired. Please request a new one.");
         }
 
         user.setVerificationCode(null);
