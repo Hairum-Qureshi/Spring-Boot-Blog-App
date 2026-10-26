@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
             DisabledException.class
     })
     public ResponseEntity<ApiError> handleAuthException(Exception e, HttpServletRequest request) {
-        var apiError = ApiError.of(HttpStatus.BAD_REQUEST.value(), "Bad Request", e.getMessage(), request.getRequestURI());
+        var apiError = ApiError.of(HttpStatus.UNPROCESSABLE_CONTENT.value(), "Bad Request", e.getMessage(), request.getRequestURI());
         return ResponseEntity.badRequest().body(apiError);
     }
 
