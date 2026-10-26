@@ -13,6 +13,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
+        ErrorResponse error = new ErrorResponse(
+                exception.getMessage(),
+                400,
+                "INVALID_VERIF_CODE"
+        );
+
+        return ResponseEntity.status(400).body(error);
+    }
+
     @ExceptionHandler({
             UsernameNotFoundException.class,
             BadCredentialsException.class,

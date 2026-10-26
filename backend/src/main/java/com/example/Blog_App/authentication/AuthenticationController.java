@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
@@ -17,7 +19,6 @@ public class AuthenticationController {
 
     public AuthenticationController(AuthenticationService authService) {
         this.authService = authService;
-
     }
 
     @PostMapping("/sign-up")
@@ -27,8 +28,22 @@ public class AuthenticationController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<TokenResponse> signInUser(@RequestBody SignInDto signInDto) {
-        TokenResponse tokenResponse = authService.signin(signInDto);
+        TokenResponse tokenResponse = authService.signIn(signInDto);
 
         return ResponseEntity.ok(tokenResponse);
     }
+
+    @PostMapping("/verify")
+    public ResponseEntity<Void> verifyUser(@RequestBody Map<String, String> verificationCode) {
+        String code = verificationCode.get("verificationCode");
+        authService.verifyUser(code);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/resend-verification-code")
+    public ResponseEntity<Void> resendVerificationCode(@RequestBody Map<String, String> email) {
+        authService.resendVerificationCode(email.get("email"));
+        return ResponseEntity.ok().build();
+    }
+
 }
