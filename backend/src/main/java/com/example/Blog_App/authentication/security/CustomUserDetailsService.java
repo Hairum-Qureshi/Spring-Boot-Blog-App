@@ -1,4 +1,4 @@
-package com.example.Blog_App.security;
+package com.example.Blog_App.authentication.security;
 
 import com.example.Blog_App.exceptions.ResourceNotFoundException;
 import com.example.Blog_App.user.UserRepository;

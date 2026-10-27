@@ -2,8 +2,10 @@ package com.example.Blog_App.authentication;
 
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
+import com.example.Blog_App.authentication.refreshToken.RefreshTokenRequest;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.user.dtos.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,4 +49,9 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest body, HttpServletRequest request, HttpServletResponse response) {
+        TokenResponse tokenResponse = authService.refresh(body, request, response);
+        return ResponseEntity.ok(tokenResponse);
+    }
 }
