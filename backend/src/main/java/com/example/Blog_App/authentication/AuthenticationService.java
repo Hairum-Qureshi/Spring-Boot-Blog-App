@@ -6,6 +6,7 @@ import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.authentication.jwt.JwtService;
 import com.example.Blog_App.authentication.refreshToken.RefreshTokenEntity;
 import com.example.Blog_App.authentication.refreshToken.RefreshTokenRepository;
+import com.example.Blog_App.authentication.refreshToken.RefreshTokenRequest;
 import com.example.Blog_App.authentication.resend.MailService;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.exceptions.InvalidVerificationCodeException;
@@ -17,7 +18,10 @@ import com.example.Blog_App.user.UserRepository;
 import com.example.Blog_App.user.UserService;
 import com.example.Blog_App.user.dtos.UserDto;
 import com.resend.core.exception.ResendException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -28,7 +32,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -139,5 +145,77 @@ public class AuthenticationService {
         } catch (Exception e) {
             throw new BadCredentialsException("Invalid username or password");
         }
+    }
+
+    private Optional<String> readRefreshTokenFromRequest(RefreshTokenRequest body, HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            Optional<String> fromCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookieService.getRefreshTokenCookieName().equals(cookie.getName())).map(Cookie::getValue).filter(cookie -> !cookie.isBlank()).findFirst();
+
+            if (fromCookie.isPresent()) return fromCookie;
+        }
+
+        if (body != null && body.refreshToken() != null && !body.refreshToken().isBlank()) {
+            return Optional.of(body.refreshToken());
+        }
+
+        String refreshHeader = request.getHeader("X-Refresh-Token");
+        if (refreshHeader != null && !refreshHeader.isBlank()) {
+            return Optional.of(refreshHeader.trim());
+        }
+
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            String candidate = authHeader.substring(7).trim();
+            if (!candidate.isEmpty()) {
+                try {
+                    if (jwtService.isRefreshToken(candidate)) {
+                        return Optional.of(candidate);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public TokenResponse refresh(RefreshTokenRequest body, HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
+
+        if (!jwtService.isRefreshToken(refreshToken)) {
+            throw new BadCredentialsException("Invalid refresh token type");
+        }
+
+        String jti = jwtService.getJti(refreshToken);
+        UUID userId = jwtService.getUserId(refreshToken);
+        RefreshTokenEntity storedRefreshToken = refreshTokenRepository.findByJti(jti).orElseThrow(() -> new BadCredentialsException("Refresh token not found"));
+
+        if (storedRefreshToken.isRevoked()) {
+            throw new BadCredentialsException("Refresh token has been revoked");
+        }
+
+        if (storedRefreshToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new BadCredentialsException("Refresh token has expired");
+        }
+
+        if (!storedRefreshToken.getUser().getId().equals(userId)) {
+            throw new BadCredentialsException("Refresh token does not belong to this user");
+        }
+
+        storedRefreshToken.setRevoked(true);
+        String newJti = UUID.randomUUID().toString();
+        storedRefreshToken.setReplacedByToken(newJti);
+        refreshTokenRepository.save(storedRefreshToken);
+
+        UserEntity user = storedRefreshToken.getUser();
+        var newRefreshTokenObj = RefreshTokenEntity.builder().jti(newJti).user(user).createdAt(Instant.now()).expiresAt(Instant.now().plusSeconds(jwtService.getRefreshTokenTTLSeconds())).revoked(false).build();
+        refreshTokenRepository.save(newRefreshTokenObj);
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user, newJti);
+        cookieService.attachRefreshCookie(response, newRefreshToken, (int) jwtService.getRefreshTokenTTLSeconds());
+        cookieService.addNoStoreHeaders(response);
+
+        return TokenResponse.of(newAccessToken, newRefreshToken, jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
     }
 }
