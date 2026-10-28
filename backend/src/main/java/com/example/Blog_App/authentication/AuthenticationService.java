@@ -1,5 +1,6 @@
 package com.example.Blog_App.authentication;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.example.Blog_App.authentication.cookies.CookieService;
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
@@ -179,6 +180,7 @@ public class AuthenticationService {
         return Optional.empty();
     }
 
+    @Transactional
     public TokenResponse refresh(RefreshTokenRequest body, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
 
