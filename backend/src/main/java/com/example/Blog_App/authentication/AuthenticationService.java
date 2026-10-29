@@ -7,7 +7,6 @@ import com.example.Blog_App.authentication.dtos.SignUpDto;
 import com.example.Blog_App.authentication.jwt.JwtService;
 import com.example.Blog_App.authentication.refreshToken.RefreshTokenEntity;
 import com.example.Blog_App.authentication.refreshToken.RefreshTokenRepository;
-import com.example.Blog_App.authentication.refreshToken.RefreshTokenRequest;
 import com.example.Blog_App.authentication.resend.MailService;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.exceptions.InvalidVerificationCodeException;
@@ -35,6 +34,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -148,15 +148,16 @@ public class AuthenticationService {
         }
     }
 
-    private Optional<String> readRefreshTokenFromRequest(RefreshTokenRequest body, HttpServletRequest request) {
+    private Optional<String> readRefreshTokenFromRequest(Map<String, String> body, HttpServletRequest request) {
         if (request.getCookies() != null) {
             Optional<String> fromCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookieService.getRefreshTokenCookieName().equals(cookie.getName())).map(Cookie::getValue).filter(cookie -> !cookie.isBlank()).findFirst();
 
             if (fromCookie.isPresent()) return fromCookie;
         }
 
-        if (body != null && body.refreshToken() != null && !body.refreshToken().isBlank()) {
-            return Optional.of(body.refreshToken());
+        String refreshToken = body != null ? body.get("refreshToken") : null;
+        if (refreshToken != null && !refreshToken.isBlank()) {
+            return Optional.of(refreshToken);
         }
 
         String refreshHeader = request.getHeader("X-Refresh-Token");
@@ -181,7 +182,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public TokenResponse refresh(RefreshTokenRequest body, HttpServletRequest request, HttpServletResponse response) {
+    public TokenResponse refresh(Map<String, String> body, HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = readRefreshTokenFromRequest(body, request).orElseThrow(() -> new BadCredentialsException("Refresh token is missing"));
 
         if (!jwtService.isRefreshToken(refreshToken)) {

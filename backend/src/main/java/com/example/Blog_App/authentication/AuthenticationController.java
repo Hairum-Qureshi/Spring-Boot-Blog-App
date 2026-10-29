@@ -2,7 +2,6 @@ package com.example.Blog_App.authentication;
 
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
-import com.example.Blog_App.authentication.refreshToken.RefreshTokenRequest;
 import com.example.Blog_App.authentication.responses.TokenResponse;
 import com.example.Blog_App.user.dtos.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +49,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(@RequestBody(required = false) RefreshTokenRequest body, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<TokenResponse> refreshToken(@RequestBody(required = false) Map<String, String> body, HttpServletRequest request, HttpServletResponse response) {
         TokenResponse tokenResponse = authService.refresh(body, request, response);
         return ResponseEntity.ok(tokenResponse);
     }
