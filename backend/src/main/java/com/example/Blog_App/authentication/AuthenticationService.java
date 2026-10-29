@@ -1,6 +1,5 @@
 package com.example.Blog_App.authentication;
 
-import org.springframework.transaction.annotation.Transactional;
 import com.example.Blog_App.authentication.cookies.CookieService;
 import com.example.Blog_App.authentication.dtos.SignInDto;
 import com.example.Blog_App.authentication.dtos.SignUpDto;
@@ -29,14 +28,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AuthenticationService {
@@ -220,5 +216,20 @@ public class AuthenticationService {
         cookieService.addNoStoreHeaders(response);
 
         return TokenResponse.of(newAccessToken, newRefreshToken, jwtService.getAccessTokenTTLSeconds(), userMapper.toDto(user));
+    }
+
+    public void signOut(HttpServletRequest request, HttpServletResponse response) {
+        readRefreshTokenFromRequest(null, request).ifPresent(token -> {
+            try {
+                if (jwtService.isRefreshToken(token)) {
+                    String jti = jwtService.getJti(token);
+                    refreshTokenRepository.findByJti(jti).ifPresent(refreshToken -> {
+                        refreshToken.setRevoked(true);
+                        refreshTokenRepository.save(refreshToken);
+                    });
+                }
+            } catch (Exception ignored) {
+            }
+        });
     }
 }

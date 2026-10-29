@@ -35,6 +35,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(tokenResponse);
     }
 
+    @PostMapping("/sign-out")
+    public ResponseEntity<Void> signOutUser(HttpServletRequest request, HttpServletResponse response) {
+        authService.signOut(request, response);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/verify")
     public ResponseEntity<Void> verifyUser(@RequestBody Map<String, String> verificationCode) {
         String code = verificationCode.get("verificationCode");
