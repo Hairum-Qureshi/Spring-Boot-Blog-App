@@ -50,10 +50,10 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
                 String email = oAuth2User.getAttributes().getOrDefault("email", "").toString();
                 String name = oAuth2User.getAttributes().getOrDefault("name", "").toString();
                 String picture = oAuth2User.getAttributes().getOrDefault("picture", "").toString();
-                UserEntity createdUser = UserEntity.builder().name(name).email(email).password("").profilePicture(picture).enabled(true).createdAt(Instant.now()).updatedAt(Instant.now()).provider(Provider.GOOGLE).isVerified(true).verificationCode("").verificationCodeExpiresAt(null).build();
+                UserEntity createdUser = UserEntity.builder().name(name).email(email).password("").profilePicture(picture).enabled(true).providerId(googleId).createdAt(Instant.now()).updatedAt(Instant.now()).provider(Provider.GOOGLE).isVerified(true).verificationCode("").verificationCodeExpiresAt(null).build();
 
                 user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(createdUser));
-                
+
                 break;
             default:
                 throw new RuntimeException("Invalid registration ID");
