@@ -10,11 +10,13 @@ import com.example.Blog_App.user.enums.Provider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -27,6 +29,12 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
     private final RefreshTokenRepository refreshTokenRepository;
     private final CookieService cookieService;
 
+    @Value("${app.auth.frontend.success-redirect}")
+    private String frontendSuccessURL;
+
+    @Value("${app.auth.frontend.failure-redirect}")
+    private String frontendFailureURL;
+
     public Oauth2SuccessHandler(UserRepository userRepository, JwtService jwtService, RefreshTokenRepository refreshTokenRepository, CookieService cookieService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
@@ -35,6 +43,7 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
     }
 
     @Override
+    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String registrationId = "unknown";
@@ -59,16 +68,17 @@ public class Oauth2SuccessHandler implements AuthenticationSuccessHandler {
                 throw new RuntimeException("Invalid registration ID");
         }
 
+
         String jti = UUID.randomUUID().toString();
         RefreshTokenEntity refreshTokenBuilder = RefreshTokenEntity.builder().jti(jti).user(user).createdAt(Instant.now()).expiresAt(Instant.now().plusSeconds(jwtService.getRefreshTokenTTLSeconds())).revoked(false).build();
         refreshTokenRepository.save(refreshTokenBuilder);
 
-        String accessToken = jwtService.generateAccessToken(user);
+        jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user, refreshTokenBuilder.getJti());
 
         cookieService.attachRefreshCookie(response, refreshToken, (int) jwtService.getRefreshTokenTTLSeconds());
 
-        response.getWriter().write("Login Successful");
+        response.sendRedirect(frontendSuccessURL);
     }
 
 
