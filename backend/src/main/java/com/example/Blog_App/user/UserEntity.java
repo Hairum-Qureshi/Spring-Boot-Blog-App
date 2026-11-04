@@ -74,6 +74,8 @@ public class UserEntity implements UserDetails {
 
     private Instant verificationCodeExpiresAt;
 
+    private String providerId;
+
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
