@@ -25,6 +25,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private static final String[] permittedUrls = {"/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"};
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, AuthenticationSuccessHandler authenticationSuccessHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -46,7 +47,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults()).sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(permittedUrls).permitAll()
                         .anyRequest().authenticated()
                 ).oauth2Login(oAuth2 -> oAuth2.successHandler(authenticationSuccessHandler).failureUrl("/sign-in?error=true")
                 ).logout(AbstractHttpConfigurer::disable)
